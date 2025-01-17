@@ -14,7 +14,7 @@ jobs:
     name: Terraform Pipeline
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }} # Setting AWS_REGION as a job-level environment variable
+      AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,16 +41,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=plan.cache
 
-      - name: Save Plan as Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: plan
-          path: plan.cache
-
-      - name: Apply Plan (Manual Trigger)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: terraform apply plan.cache
-
-      - name: Terraform Destroy (Manual Trigger)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: terraform destroy -auto-approve
+      - name: Terraform Apply
+        run: terraform apply -auto-approve plan.cache
